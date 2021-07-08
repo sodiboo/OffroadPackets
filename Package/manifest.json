@@ -1,0 +1,7 @@
+{
+    "name": "OffroadPackets",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/Terrain2/OffroadPackets",
+    "description": "My own packet helper library because i didn't like the other one.",
+    "dependencies": []
+}
