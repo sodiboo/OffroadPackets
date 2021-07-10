@@ -41,7 +41,7 @@ Does all this sound way too confusing to you? Check out how i handle unknown pac
 
 ## Sending packets
 
-There are 5 methods for sending packets (technically 10, but half are to save you an import of Facepunch.Steamworks). All these methods return an ``IDisposable`` object, which when disposed, actually sends the damn packet and disposes the ``BinaryWriter`` and its underlying ``MemoryStream``. You don't need to ever use this object directly, but you should put it within a ``using()`` statement, as it makes sure it is disposed correctly.
+There are 5 methods for sending packets. All these methods return an ``IDisposable`` object, which when disposed, actually sends the damn packet and disposes the ``BinaryWriter`` and its underlying ``MemoryStream``. You don't need to ever use this object directly, but you should put it within a ``using()`` statement, as it makes sure it is disposed correctly.
 
 - ``packets.WriteToServer(string name, out BinaryWriter writer, P2PSend type)`` sends a packet from the local client to the server
 - ``packets.WriteToClient(string name, int client, out BinaryWriter writer, P2PSend type)`` sends a packet from the server to ``client``
@@ -49,7 +49,7 @@ There are 5 methods for sending packets (technically 10, but half are to save yo
 - ``packets.WriteToAllExcept(string name, int client, out BinaryWriter writer, P2PSend type)`` sends a packet from the server to every client except ``client``
 - ``packets.WriteToAllExcept(string name, int[] clients, out BinaryWriter writer, P2PSend type)`` sends a packet from the server to every client except those in ``clients``
 
-All these methods have an equivalent overload without the last ``P2PSend`` argument, which defaults to ``P2PSend.Reliable`` (TCP). This is because usually, you want reliable packets, and you don't usually need to use Steamworks directly. So unless you actually need to mess with the ``P2PSend`` argument, you don't even need to reference Facepunch.Steamworks in your plugin.
+All these methods have an equivalent overload without the last ``P2PSend`` argument, which defaults to ``P2PSend.Reliable`` (TCP).
 
 All of these methods take an ``out BinaryWriter writer``, which is the writer you'll be using to write the packet with. Just in case you don't know, you would specify this parameter as ``out var writer``, and then ``writer`` is the ``BinaryWriter`` for the packet, assigned by the method.
 
