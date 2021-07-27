@@ -4,6 +4,10 @@ This is a library for sending and receiving custom packets that won't ever confl
 
 This library only registers the packet ID ``0``, because it's not used by the base game. Unless a mod GUID only contains the characters ``%*/49>@EJOTY^`ejoty~`` after a space anywhere, this also won't conflict with iiVeil's PacketHelper. It should actually be completely cross-compatible and you should be able to use both at once if you really wanna. If your GUID's offset evaluates to 0, you have bigger problems such as conflicting with the game if you register so much as 2 packets anyways, and that's why i made this library, as it avoids such issues altogether.
 
+## Not on windows?
+
+This library is built against the windows version of Facepunch.Steamworks. If you're not on Windows, install [UnifiedSteamworks](https://muck.thunderstore.io/package/Terrain/UnifiedSteamworks/).
+
 ## Terminology
 
 - A "Server Packet" is a packet sent by the server, to a client (or multiple clients).
@@ -52,6 +56,16 @@ There are 5 methods for sending packets. All these methods return an ``IDisposab
 All these methods have an equivalent overload without the last ``P2PSend`` argument, which defaults to ``P2PSend.Reliable`` (TCP).
 
 All of these methods take an ``out BinaryWriter writer``, which is the writer you'll be using to write the packet with. Just in case you don't know, you would specify this parameter as ``out var writer``, and then ``writer`` is the ``BinaryWriter`` for the packet, assigned by the method.
+
+If you don't wanna use these methods and their provided writer (or like, no ``BinaryWriter`` at all), you can also directly send a byte array using any of the following methods:
+
+- ``packets.SendToServer(string name, byte[] bytes, P2PSend type)``
+- ``packets.SendToClient(string name, int client, byte[] bytes, P2PSend type)``
+- ``packets.SendToAll(string name, byte[] bytes, P2PSend type)``
+- ``packets.SendToAllExcept(string name, int client, byte[] bytes, P2PSend type)``
+- ``packets.SendToAllExcept(string name, int[] clients, byte[] bytes, P2PSend type)``
+
+These have no equivalent without ``P2PSend``. You will still read the message using a ``BinaryReader``.
 
 ## Extension methods
 

@@ -14,7 +14,7 @@ namespace Terrain.Packets.Plugin
             Name = "OffroadPackets",
             Author = "Terrain",
             Guid = Author + "." + Name,
-            Version = "1.0.1.0";
+            Version = "1.1.0.0";
 
         internal static ManualLogSource log;
         internal readonly Harmony harmony;

@@ -1,5 +1,5 @@
 using BepInEx;
-using SteamworksFix;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,9 +21,9 @@ namespace Terrain.Packets
 
     public class OffroadPacketWriter : IDisposable
     {
-        BinaryWriter writer;
-        MemoryStream stream;
-        Action<byte[]> callback;
+        readonly BinaryWriter writer;
+        readonly MemoryStream stream;
+        readonly Action<byte[]> callback;
         public OffroadPacketWriter(Action<byte[]> callback, out BinaryWriter writer)
         {
             this.callback = callback;

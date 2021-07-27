@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using HarmonyLib;
-using SteamworksFix;
+using Steamworks;
 using Terrain.Packets.Compatibility;
 using Terrain.Packets.Plugin;
 using UnityEngine;
@@ -18,9 +18,11 @@ namespace Terrain.Packets.LowLevelNetworking
             if (NetworkController.Instance.networkType == NetworkController.NetworkType.Classic)
             {
                 LocalClient.instance.tcp.SendData(packet);
-                return;
             }
-            SteamworksMethods.SendPacket(LocalClient.instance.ServerHost(), packet, type, SteamPacketManager.NetworkChannel.ToServer);
+            else
+            {
+                SteamPacketManager.SendPacket(LocalClient.instance.serverHost, packet, type, SteamPacketManager.NetworkChannel.ToServer);
+            }
         }
 
         internal static void To(int toClient, Packet packet, P2PSend type)
@@ -29,9 +31,11 @@ namespace Terrain.Packets.LowLevelNetworking
             if (NetworkController.Instance.networkType == NetworkController.NetworkType.Classic)
             {
                 Server.clients[toClient].tcp.SendData(packet);
-                return;
             }
-            SteamworksMethods.SendPacket(Server.clients[toClient].player.SteamId(), packet, type, SteamPacketManager.NetworkChannel.ToClient);
+            else
+            {
+                SteamPacketManager.SendPacket(Server.clients[toClient].player.steamId, packet, type, SteamPacketManager.NetworkChannel.ToClient);
+            }
         }
 
         internal static void ToAll(Packet packet, P2PSend type)
@@ -47,9 +51,9 @@ namespace Terrain.Packets.LowLevelNetworking
             }
             foreach (Client client in Server.clients.Values)
             {
-                if (((client != null) ? client.player : null) != null)
+                if (client?.player != null)
                 {
-                    SteamworksMethods.SendPacket(client.player.SteamId(), packet, type, SteamPacketManager.NetworkChannel.ToClient);
+                    SteamPacketManager.SendPacket(client.player.steamId, packet, type, SteamPacketManager.NetworkChannel.ToClient);
                 }
             }
         }
@@ -70,9 +74,9 @@ namespace Terrain.Packets.LowLevelNetworking
             }
             foreach (Client client in Server.clients.Values)
             {
-                if (((client != null) ? client.player : null) != null && SteamLobby.steamIdToClientId[client.player.SteamId()] != exceptClient)
+                if (client?.player != null && SteamLobby.steamIdToClientId[client.player.steamId] != exceptClient)
                 {
-                    SteamworksMethods.SendPacket(client.player.SteamId(), packet, type, SteamPacketManager.NetworkChannel.ToClient);
+                    SteamPacketManager.SendPacket(client.player.steamId, packet, type, SteamPacketManager.NetworkChannel.ToClient);
                 }
             }
         }
@@ -101,19 +105,19 @@ namespace Terrain.Packets.LowLevelNetworking
             }
             foreach (Client client in Server.clients.Values)
             {
-                if (((client != null) ? client.player : null) != null)
+                if (client?.player != null)
                 {
                     bool flag2 = false;
                     foreach (int num2 in exceptClients)
                     {
-                        if (SteamLobby.steamIdToClientId[client.player.SteamId()] == num2)
+                        if (SteamLobby.steamIdToClientId[client.player.steamId] == num2)
                         {
                             flag2 = true;
                         }
                     }
                     if (!flag2)
                     {
-                        SteamworksMethods.SendPacket(client.player.SteamId(), packet, type, SteamPacketManager.NetworkChannel.ToClient);
+                        SteamPacketManager.SendPacket(client.player.steamId, packet, type, SteamPacketManager.NetworkChannel.ToClient);
                     }
                 }
             }

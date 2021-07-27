@@ -43,6 +43,10 @@
       <HintPath>$(GameDir)\Muck_Data\Managed\Mono.Security.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Facepunch.Steamworks.Win64">
+      <HintPath>$(GameDir)\Muck_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -308,7 +312,6 @@
     <Compile Include="ImportantPackets.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Networking.cs" />
-    <Compile Include="SteamworksFix.cs" />
     <None Include="GameDir.targets" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
