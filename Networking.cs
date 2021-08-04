@@ -1,8 +1,6 @@
 using System;
-using System.IO;
 using HarmonyLib;
 using Steamworks;
-using Terrain.Packets.Compatibility;
 using Terrain.Packets.Plugin;
 using UnityEngine;
 
@@ -176,9 +174,7 @@ namespace Terrain.Packets.LowLevelNetworking
                         return;
                     }
                     var bytes = packet.ReadBytes(packet.UnreadLength());
-                    using (var stream = new MemoryStream(bytes))
-                    using (var reader = new BinaryReader(stream))
-                        handler(reader);
+                    handler(bytes);
                 }
                 catch (Exception ex)
                 {
@@ -214,9 +210,7 @@ namespace Terrain.Packets.LowLevelNetworking
                         return;
                     }
                     var bytes = packet.ReadBytes(packet.UnreadLength());
-                    using (var stream = new MemoryStream(bytes))
-                    using (var reader = new BinaryReader(stream))
-                        handler(fromClient, reader);
+                    handler(fromClient, bytes);
                 }
                 catch (Exception ex)
                 {

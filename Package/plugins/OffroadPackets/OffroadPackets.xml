@@ -1,0 +1,653 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OffroadPackets</name>
+    </assembly>
+    <members>
+        <member name="T:Terrain.Packets.OffroadPacketAttribute">
+            <summary>
+            An attribute that is applied to classes that contain packet or request handlers, as well as directly on packet or request handlers.
+            </summary>
+        </member>
+        <member name="P:Terrain.Packets.OffroadPacketAttribute.Name">
+            <summary>
+            The name associated with this packet or request handler.
+            </summary>
+            <remarks>
+            On a method, if unspecified, this defaults to the method name. <br />
+            On a class, if unspecified, has a default value that depends on how it's used.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPacketAttribute.#ctor(System.String)">
+            <summary>
+            Marks a method as a packet handler, or a class as containing packet handlers.
+            </summary>
+            <param name="name">The name of this packet or guid of the instance. This defaults to the method name, the full name of the type, or the plugin guid, depending on the context. </param>
+            <remarks>
+            On a class, this is only used when creating an instance of <see cref="T:Terrain.Packets.OffroadPackets" /> (and even then isn't required). <br />
+            On a method, this is only used when searching for packet handlers in a type.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets">
+            <summary>
+            Contains packet and request handlers, and allows you to send packets and requests.
+            </summary>
+        </member>
+        <member name="F:Terrain.Packets.OffroadPackets.Instances">
+            <summary>
+            A static lookup table of all instances that have been created, by their GUID. This is used to find
+            </summary>
+        </member>
+        <member name="P:Terrain.Packets.OffroadPackets.Guid">
+            <summary>
+            The GUID that distinguishes packets from this instance between others.
+            </summary>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Create">
+            <summary>
+            Registers an instance of <see cref="T:Terrain.Packets.OffroadPackets" />, searching through the current assembly for any types marked with <see cref="T:Terrain.Packets.OffroadPacketAttribute" />. <br />
+            This can be prone to error in some cases, as it uses <see cref="T:System.Diagnostics.StackFrame" />. It's great for prototyping, but you should probably use <see cref="M:Terrain.Packets.OffroadPackets.Register``1" /> instead. <br />
+            
+            The type is uses for packet handlers is the first in this list:
+            <list type="number">
+                <item>The first type it finds in the assembly with a <see cref="T:Terrain.Packets.OffroadPacketAttribute" />.</item>
+                <item>The type that called this method, which is assumed to have a <see cref="T:BepInEx.BepInPlugin" /> attribute.</item>
+            </list>
+            
+            The guid of the <see cref="T:Terrain.Packets.OffroadPackets" /> instance will be the first in this list:
+            <list type="number">
+                <item>The <see cref="P:Terrain.Packets.OffroadPacketAttribute.Name" /> of the type it found.</item>
+                <item>The <see cref="P:System.Type.FullName" /> of the type it found.</item>
+                <item>The <see cref="P:BepInEx.BepInPlugin.GUID" /> of the type that called this method.</item>
+            </list>
+            </summary>
+            <returns>The instance of <see cref="T:Terrain.Packets.OffroadPackets" /> it created. Don't lose it, you'll need it to send packets.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Create``1">
+            <summary>
+            Registers an instance of <see cref="T:Terrain.Packets.OffroadPackets" />, searching through <typeparamref name="Handler" /> and all its subtypes for any methods marked with <see cref="T:Terrain.Packets.OffroadPacketAttribute" />. <br />
+            Generally, this is easier to understand than <see cref="M:Terrain.Packets.OffroadPackets.Register(System.Type)" />, since it clearly defines which type it reads from. <br />
+            
+            The guid of the <see cref="T:Terrain.Packets.OffroadPackets" /> will be the first in this list:
+            <list type="number">
+                <item>The <see cref="P:Terrain.Packets.OffroadPacketAttribute.Name" /> of <typeparamref name="Handler" />.</item>
+                <item>The <see cref="P:System.Type.FullName" /> of <typeparamref name="Handler" />.</item>
+                <item>The <see cref="P:BepInEx.BepInPlugin.GUID" /> of the type that called this method.</item>
+            </list>
+            </summary>
+            <typeparam name="Handler">The type where you defined all your packet handlers.</typeparam>
+            <returns>The instance of <see cref="T:Terrain.Packets.OffroadPackets" /> it created. Don't lose it, you'll need it to send packets.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Register``1">
+            <summary>
+            Registers all packet and request handlers in the given type and its subtypes. That is, all static methods with an <see cref="T:Terrain.Packets.OffroadPacketAttribute" />.
+            </summary>
+            <typeparam name="T">The type that contains packet and request handlers.</typeparam>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Register(System.Type)">
+            <summary>
+            Registers all packet and request handlers in the given type and its subtypes. That is, all static methods with an <see cref="T:Terrain.Packets.OffroadPacketAttribute" />.
+            </summary>
+            <param name="type">The type that contains packet and request handlers.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.#ctor(System.String)">
+            <summary>
+            Creates an empty packet controller manually.
+            </summary>
+            <param name="guid">The GUID of this instance. This must be unique, just like your <see cref="P:BepInEx.BepInPlugin.GUID" />. Honestly, you should probably just use that one, it's unique anyways.</param>
+        </member>
+        <member name="F:Terrain.Packets.OffroadPackets.ServerPacketHandlers">
+            <summary>
+            All the methods that handle packets sent by the server, mapped by their name.
+            </summary>
+        </member>
+        <member name="F:Terrain.Packets.OffroadPackets.ClientPacketHandlers">
+            <summary>
+            All the methods that handle packets sent by the client, mapped by their name.
+            </summary>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ServerPacketHandler">
+            <summary>
+            A method that is ran on the client and handles a packet sent by the server.
+            </summary>
+            <param name="reader">The contents of the packet the server sent.</param>
+            <remarks>
+            A handler method with this signature will be placed in a wrapper method that creates and manages the reader and its base stream.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ClientPacketHandler">
+            <summary>
+            A method that is ran on the server and handles a packet sent by a client.
+            </summary>
+            <param name="fromClient">The client ID that sent this packet.</param>
+            <param name="reader">The contents of the packet the client sent.</param>
+            <remarks>
+            A handler method with this signature will be placed in a wrapper method that creates and manages the reader and its base stream.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ServerRawPacketHandler">
+            <summary>
+            A method that is ran on the client and handles a packet sent by the server.
+            </summary>
+            <param name="data">The contents of the packet the server sent.</param>
+            <remarks>
+            If you send a packet using the <c>WriteTo**</c> methods, the buffer may be bigger than the content actually written, therefore you shouldn't use <c>WriteTo**</c> and raw packet handlers in combination.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ClientRawPacketHandler">
+            <summary>
+            A method that is ran on the server and handles a packet sent by a client.
+            </summary>
+            <param name="fromClient">The client ID that sent this packet.</param>
+            <param name="data">The contents of the packet the client sent.</param>
+            <remarks>
+            If you send a message using the <see cref="M:Terrain.Packets.OffroadPackets.WriteToServer(System.String,Steamworks.P2PSend)" /> method, the buffer may be bigger than the content actually written, therefore you shouldn't use <see cref="M:Terrain.Packets.OffroadPackets.WriteToServer(System.String,Steamworks.P2PSend)" /> and a raw packet handler in combination.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ServerPacketHandler)">
+            <summary>
+            Registers a method that will run on the client and handle a packet sent by the server.
+            </summary>
+            <param name="name">The name of the packet to register.</param>
+            <param name="handler">The method that handles this packet.</param>
+            <remarks>
+            If you register your handler using this method, your handler will be called from a wrapper method that creates and manages the reader and its base stream.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ServerRawPacketHandler)">
+            <summary>
+            Registers a method that will run on the client and handle a packet sent by the server.
+            </summary>
+            <param name="name">The name of the packet to register.</param>
+            <param name="handler">The method that handles this packet.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ClientPacketHandler)">
+            <summary>
+            Registers a method that will run on the server and handle a packet sent by the client.
+            </summary>
+            <param name="name">The name of the packet to register.</param>
+            <param name="handler">The method that handles this packet.</param>
+            <remarks>
+            If you register your handler using this method, your handler will be called from a wrapper method that creates and manages the reader and its base stream.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ClientRawPacketHandler)">
+            <summary>
+            Registers a method that will run on the server and handle a packet sent by the client.
+            </summary>
+            <param name="name">The name of the packet to register.</param>
+            <param name="handler">The method that handles this packet.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.WriteToServer(System.String,Steamworks.P2PSend)">
+            <summary>
+            Starts writing a packet that will be sent to the server.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+            <returns>An <see cref="T:Terrain.Packets.OffroadPacketWriter" /> that you can use to write your packet.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.WriteToClient(System.String,System.Int32,Steamworks.P2PSend)">
+            <summary>
+            Starts writing a packet that will be sent to only the client with id <paramref name="client" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="client">The client id that will receive this packet.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+            <returns>An <see cref="T:Terrain.Packets.OffroadPacketWriter" /> that you can use to write your packet.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.WriteToAll(System.String,Steamworks.P2PSend)">
+            <summary>
+            Starts writing a packet that will be sent to every connected client (including the local one).
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+            <returns>An <see cref="T:Terrain.Packets.OffroadPacketWriter" /> that you can use to write your packet.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.WriteToAllExcept(System.String,System.Int32,Steamworks.P2PSend)">
+            <summary>
+            Starts writing a packet that will be sent to every client in the lobby except for the client with id <paramref name="client" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="client">The client id that will not receive this packet.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+            <returns>An <see cref="T:Terrain.Packets.OffroadPacketWriter" /> that you can use to write your packet.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.WriteToAllExcept(System.String,System.Int32[],Steamworks.P2PSend)">
+            <summary>
+            Starts writing a packet that will be sent to every client in the lobby except for the clients with the ids in <paramref name="clients" />
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="clients">The client ids that will not receive this packet.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+            <returns>An <see cref="T:Terrain.Packets.OffroadPacketWriter" /> that you can use to write your packet.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.SendToServer(System.String,System.Byte[],Steamworks.P2PSend)">
+            <summary>
+            Sends a packet to the server with the data in <paramref name="bytes" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="bytes">The raw buffer of bytes to send.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.SendToClient(System.String,System.Int32,System.Byte[],Steamworks.P2PSend)">
+            <summary>
+            Sends a packet to the specified <paramref name="client" /> with the data in <paramref name="bytes" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="client">The client id that will receive this packet.</param>
+            <param name="bytes">The raw buffer of bytes to send.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.SendToAll(System.String,System.Byte[],Steamworks.P2PSend)">
+            <summary>
+            Sends a packet to every connected client (including the local one) with the data in <paramref name="bytes" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="bytes">The raw buffer of bytes to send.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.SendToAllExcept(System.String,System.Int32,System.Byte[],Steamworks.P2PSend)">
+            <summary>
+            Sends a packet to every connected client except for <paramref name="client" /> with the data in <paramref name="bytes" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="client">The client id that will not receive this packet.</param>
+            <param name="bytes">The raw buffer of bytes to send.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.SendToAllExcept(System.String,System.Int32[],System.Byte[],Steamworks.P2PSend)">
+            <summary>
+            Sends a packet to every connected client except for those in <paramref name="clients" /> with the data in <paramref name="bytes" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="clients">The client ids that will not receive this packet.</param>
+            <param name="bytes">The raw buffer of bytes to send.</param>
+            <param name="type">The <see cref="T:Steamworks.P2PSend" /> to use for this request.</param>
+        </member>
+        <member name="F:Terrain.Packets.OffroadPackets.ServerRequestHandlers">
+            <summary>
+            All the methods that handle requests sent by the server, mapped by their name.
+            </summary>
+        </member>
+        <member name="F:Terrain.Packets.OffroadPackets.ClientRequestHandlers">
+            <summary>
+            All the methods that handle requests sent by the client, mapped by their name.
+            </summary>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ServerRequestHandler">
+            <summary>
+            A method that runs on the client and responds to a request sent by the server.
+            </summary>
+            <param name="reader">The contents of the request the server sent</param>
+            <param name="writer">The response that you can write back to the server.</param>
+            <returns>A task that should complete when the entire response has been written to <paramref name="writer" />, or that throws if the request couldn't be responded to.</returns>
+            <remarks>
+            Since requests are asynchronous, the handlers are also permitted to be asynchronous. And since your handler is asynchronous, it may not always run on the main thread!
+            Take great caution before interacting with Unity, because it doesn't generally like when you do things off the main thread. <br />
+            If your method is synchronous, you can just return <see cref="P:System.Threading.Tasks.Task.CompletedTask" />.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ClientRequestHandler">
+            <summary>
+            A method that runs on the server and responds to a request sent by a client.
+            </summary>
+            <param name="fromClient">The client ID that sent this request.</param>
+            <param name="reader">The contents of the request the client sent</param>
+            <param name="writer">The response that you can write back to the client.</param>
+            <returns>A task that should complete when the entire response has been written to <paramref name="writer" />, or that throws if the request couldn't be responded to.</returns>
+            <remarks>
+            Since requests are asynchronous, the handlers are also permitted to be asynchronous. And since your handler is asynchronous, it may not always run on the main thread!
+            Take great caution before interacting with Unity, because it doesn't generally like when you do things off the main thread. <br />
+            If your method is synchronous, you can just return <see cref="P:System.Threading.Tasks.Task.CompletedTask" />.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ServerRawRequestHandler">
+            <summary>
+            A method that runs on the client and responds to a request sent by the server.
+            </summary>
+            <param name="data">The contents of the request the server sent.</param>
+            <returns>A task that should complete with the response, or that throws if the request couldn't be responded to.</returns>
+            <remarks>
+            Since requests are asynchronous, the handlers are also permitted to be asynchronous. And since your handler is asynchronous, it may not always run on the main thread!
+            Take great caution before interacting with Unity, because it doesn't generally like when you do things off the main thread. <br />
+            If your method is synchronous, you can just return <see cref="M:System.Threading.Tasks.Task.FromResult``1(``0)" />. <br />
+            If you send a message using the <see cref="M:Terrain.Packets.OffroadPackets.WriteToClient(System.String,System.Int32,Steamworks.P2PSend)"/> method, the buffer may be bigger than the content actually written, therefore you shouldn't use <see cref="M:Terrain.Packets.OffroadPackets.WriteToClient(System.String,System.Int32,Steamworks.P2PSend)"/> and a raw request handler in combination.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPackets.ClientRawRequestHandler">
+            <summary>
+            A method that runs on the server and responds to a request sent by a client.
+            </summary>
+            <param name="fromClient">The client ID that sent this request.</param>
+            <param name="data">The contents of the request the client sent.</param>
+            <returns>A task that should complete with the response, or that throws if the request couldn't be responded to.</returns>
+            <remarks>
+            Since requests are asynchronous, the handlers are also permitted to be asynchronous. And since your handler is asynchronous, it may not always run on the main thread!
+            Take great caution before interacting with Unity, because it doesn't generally like when you do things off the main thread. <br />
+            If your method is synchronous, you can just return <see cref="M:System.Threading.Tasks.Task.FromResult``1(``0)" />. <br />
+            If you send a message using the <see cref="M:Terrain.Packets.OffroadPackets.WriteToServer(System.String,Steamworks.P2PSend)"/> method, the buffer may be bigger than the content actually written, therefore you shouldn't use <see cref="M:Terrain.Packets.OffroadPackets.WriteToServer(System.String,Steamworks.P2PSend)"/> and a raw request handler in combination.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ServerRequestHandler)">
+            <summary>
+            Registers a method that will run on the client and respond to a request sent by the server.
+            </summary>
+            <param name="name">The name of the request to register.</param>
+            <param name="handler">The method that handles this request.</param>
+            <remarks>
+            If you register your handler using this method, your handler will be called from a wrapper method that creates and manages the reader, writer, and their base streams.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ServerRawRequestHandler)">
+            <summary>
+            Registers a method that will run on the client and respond to a request sent by the server.
+            </summary>
+            <param name="name">The name of the request to register.</param>
+            <param name="handler">The method that handles this request.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ClientRequestHandler)">
+            <summary>
+            Registers a method that will run on the server and respond to a request sent by the client.
+            </summary>
+            <param name="name">The name of the request to register.</param>
+            <param name="handler">The method that handles this request.</param>
+            <remarks>
+            If you register your handler using this method, your handler will be called from a wrapper method that creates and manages the reader, writer, and their base streams.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.Handle(System.String,Terrain.Packets.OffroadPackets.ClientRawRequestHandler)">
+            <summary>
+            Registers a method that will run on the server and respond to a request sent by the client.
+            </summary>
+            <param name="name">The name of the request to register.</param>
+            <param name="handler">The method that handles this request.</param>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.SendRequestToServer(System.String,System.Byte[])">
+            <summary>
+            Sends a request to the server with the data in <paramref name="request" />. <br />
+            To save some memory and latency, sending a request as the server will directly call the handler method and skip any packets.
+            As a side effect, if you call this from the server, the return value will be exactly the <see cref="T:System.Threading.Tasks.Task`1" /> the handler method returned.
+            If your handler uses <see cref="T:System.IO.BinaryReader" />s and <see cref="T:System.IO.BinaryWriter" />s, it may not be the exact same <see cref="T:System.Threading.Tasks.Task`1" />, but it will complete with the same exceptions.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="request">The raw buffer of bytes to send.</param>
+            <returns>The task that may or may not complete with the bytes the server responds with.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.SendRequestToClient(System.String,System.Int32,System.Byte[])">
+            <summary>
+            Sends a request to the client with the id <paramref name="client" /> with the data in <paramref name="request" />. <br />
+            To save some memory and latency, sending a request to the local client will directly call the handler method and skip any packets.
+            As a side effect, if you send a request to the local client, the return value will be exactly the <see cref="T:System.Threading.Tasks.Task`1" /> the handler method returned.
+            If your handler uses <see cref="T:System.IO.BinaryReader" />s and <see cref="T:System.IO.BinaryWriter" />s, it may not be the exact same <see cref="T:System.Threading.Tasks.Task`1" />, but it will complete with the same exceptions.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="client">The client id that will receive, handle, and answer this request.</param>
+            <param name="request">The raw buffer of bytes to send.</param>
+            <returns>The task that may or may not complete with the bytes the client responds with.</returns>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.WriteRequestToServer(System.String)">
+            <summary>
+            Starts writing a request to the server.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <returns>An <see cref="T:Terrain.Packets.OffroadRequest" /> you can use to write and send this request.</returns>
+            <remarks>
+            To save some memory and latency, sending a request as the server will directly call the handler method and skip any packets.
+            As a side effect, if you call this from the server, the final <see cref="T:System.Threading.Tasks.Task`1" /> will complete with the same exceptions as the handler method.
+            </remarks>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPackets.WriteRequestToClient(System.String,System.Int32)">
+            <summary>
+            Starts writing a request to the client with id <paramref name="client" />.
+            </summary>
+            <param name="name">The name of the packet you want to send.</param>
+            <param name="client">The client id to send this request to.</param>
+            <returns>An <see cref="T:Terrain.Packets.OffroadRequest" /> you can use to write and send this request.</returns>
+            <remarks>
+            To save some memory and latency, sending a request to the local client will directly call the handler method and skip any packets.
+            As a side effect, if you send a request to the local client, the final <see cref="T:System.Threading.Tasks.Task`1" /> will complete with the same exceptions as the handler method.
+            </remarks>
+        </member>
+        <member name="T:Terrain.Packets.OffroadPacketWriter">
+            <summary>
+            A wrapper object that holds onto a callback and some state for writing Offroad Packets. You should put this in a using statement, in your send method, because when this is disposed, the packet is sent.
+            </summary>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPacketWriter.Send">
+            <summary>
+            Sends the packet and disposes the stream it wrote to.
+            </summary>
+        </member>
+        <member name="M:Terrain.Packets.OffroadPacketWriter.Dispose(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="T:Terrain.Packets.RejectedRequestException">
+            <summary>
+            An exception whose message will be sent across the network if thrown in a request handler.
+            </summary>
+        </member>
+        <member name="M:Terrain.Packets.RejectedRequestException.#ctor(System.String)">
+            <summary>
+            Creates an exception that will be sent across the network if thrown in a request handler. Due to privacy and security concerns, other exceptions are not sent by default.
+            </summary>
+            <param name="message">The message that will be sent to the receiver instead of a response.</param>
+        </member>
+        <member name="T:Terrain.Packets.OffroadRequest">
+            <summary>
+            A helper class to write requests. If you don't call <see cref="M:Terrain.Packets.OffroadRequest.Send" />, your request will not be sent.
+            </summary>
+        </member>
+        <member name="M:Terrain.Packets.OffroadRequest.Send">
+            <summary>
+            Finishes writing this request and sends it. This will also dispose the current instance.
+            </summary>
+            <returns>A task that may or may not complete with the response the receiver wrote.</returns>
+        </member>
+        <member name="T:Terrain.Packets.BinaryWriterExtensions">
+            <summary>
+            Contains extension methods on <see cref="T:System.IO.BinaryWriter" /> for writing common Unity types.
+            </summary>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Vector2)">
+            <summary>
+            Writes an 8-byte two-dimensional vector of floating point numbers and advances the stream position by 8 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="vector">The vector to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Vector2Int)">
+            <summary>
+            Writes an 8-byte two-dimensional vector of integers and advances the stream position by 8 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="vector">The vector to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Vector3)">
+            <summary>
+            Writes a 12-byte three-dimensional vector of floating point numbers and advances the stream position by 12 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="vector">The vector to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Vector3Int)">
+            <summary>
+            Writes a 12-byte three-dimensional vector of integers and advances the stream position by 12 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="vector">The vector to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Vector4)">
+            <summary>
+            Writes a 16-byte four-dimensional vector of floating point numbers and advances the stream position by 16 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="vector">The vector to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Quaternion)">
+            <summary>
+            Writes a 16-byte quaternion and advances the stream position by 16 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="quaternion">The quaternion to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Matrix4x4)">
+            <summary>
+            Writes a 64-byte 4x4 matrix and advances the stream position by 64 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="matrix">The 4x4 matrix to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Plane)">
+            <summary>
+            Writes a 16-byte plane and advances the stream position by 16 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="plane">The plane to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Color)">
+            <summary>
+            Writes a 16-byte color represented by floating point values in the range 0..1 and advances the stream position by 16 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="color">The color to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Color32)">
+            <summary>
+            Writes a 4-byte color represented by integer values in the range 0..255 and advances the stream position by 4 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="color">The color to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Rect)">
+            <summary>
+            Writes a 16-byte two-dimensional rectangle and advances the stream position by 16 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="rect">The rectangle to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Pose)">
+            <summary>
+            Writes a 28-byte three-dimensional pose and advances the stream position by 28 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="pose">The pose to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.Bounds)">
+            <summary>
+            Writes a 24-byte three-dimensional bounding box and advances the stream position by 24 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="bounds">The bounding box to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="M:Terrain.Packets.BinaryWriterExtensions.Write(System.IO.BinaryWriter,UnityEngine.BoundingSphere)">
+            <summary>
+            Writes a 16-byte three-dimensional bounding sphere and advances the stream position by 16 bytes.
+            </summary>
+            <param name="writer">The <see cref="T:System.IO.BinaryWriter" /> to write to.</param>
+            <param name="sphere">The bounding sphere to write to <paramref name="writer" />.</param>
+        </member>
+        <member name="T:Terrain.Packets.BinaryReaderExtensions">
+            <summary>
+            Contains extension methods on <see cref="T:System.IO.BinaryReader" /> for reading common Unity types.
+            </summary>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadVector2(System.IO.BinaryReader)">
+            <summary>
+            Reads an 8-byte two-dimensional vector of floating point numbers and advances the current position of the stream by 8 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>An 8-byte two-dimensional vector of floating point numbers that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadVector2Int(System.IO.BinaryReader)">
+            <summary>
+            Reads an 8-byte two-dimensional vector of integers and advances the current position of the stream by 8 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>An 8-byte two-dimensional vector of integers that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadVector3(System.IO.BinaryReader)">
+            <summary>
+            Reads a 12-byte three-dimensional vector of floating point numbers and advances the current position of the stream by 12 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 12-byte three-dimensional vector of floating point numbers that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadVector3Int(System.IO.BinaryReader)">
+            <summary>
+            Reads a 12-byte three-dimensional vector of integers and advances the current position of the stream by 12 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 12-byte three-dimensional vector of integers that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadVector4(System.IO.BinaryReader)">
+            <summary>
+            Reads a 16-byte four-dimensional vector of floating point numbers and advances the current position of the stream by 16 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 16-byte four-dimensional vector of floating point numbers that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadQuaternion(System.IO.BinaryReader)">
+            <summary>
+            Reads a 16-byte quaternion and advances the current position of the stream by 16 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 16-byte quaternion that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadMatrix4x4(System.IO.BinaryReader)">
+            <summary>
+            Reads a 64-byte 4x4 matrix and advances the current position of the stream by 64 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 64-byte 4x4 matrix that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadPlane(System.IO.BinaryReader)">
+            <summary>
+            Reads a 16-byte plane and advances the current position of the stream by 16 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 16-byte plane that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadColor(System.IO.BinaryReader)">
+            <summary>
+            Reads a 16-byte color represented by floating point values in the range 0..1 and advances the current position of the stream by 16 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 16-byte color that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadColor32(System.IO.BinaryReader)">
+            <summary>
+            Reads a 4-byte color represented by integer values in the range 0..255 and advances the current position of the stream by 16 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 4-byte color that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadRect(System.IO.BinaryReader)">
+            <summary>
+            Reads a 16-byte two-dimensional rectangle and advances the current position of the stream by 16 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 16-byte two-dimensional rectangle that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadPose(System.IO.BinaryReader)">
+            <summary>
+            Reads a 28-byte three-dimensional pose and advances the current position of the stream by 28 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 28-byte three-dimensional pose that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadBounds(System.IO.BinaryReader)">
+            <summary>
+            Reads a 24-byte three-dimensional bounding box and advances the current position of the stream by 24 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 24-byte three-dimensional bounding box that was read from <paramref name="reader" />.</returns>
+        </member>
+        <member name="M:Terrain.Packets.BinaryReaderExtensions.ReadBoundingSphere(System.IO.BinaryReader)">
+            <summary>
+            Reads a 16-byte three-dimensional bounding sphere and advances the current position of the stream by 16 bytes.
+            </summary>
+            <param name="reader">The <see cref="T:System.IO.BinaryReader" /> to read from.</param>
+            <returns>A 16-byte three-dimensional bounding sphere that was read from <paramref name="reader" />.</returns>
+        </member>
+    </members>
+</doc>

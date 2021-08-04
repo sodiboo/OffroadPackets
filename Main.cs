@@ -1,9 +1,9 @@
+#pragma warning disable CS1591 // document public members
+using System.IO;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using System.IO;
-using System.Reflection;
-using Terrain.Packets.Compatibility;
 
 namespace Terrain.Packets.Plugin
 {
@@ -14,14 +14,14 @@ namespace Terrain.Packets.Plugin
             Name = "OffroadPackets",
             Author = "Terrain",
             Guid = Author + "." + Name,
-            Version = "1.1.0.0";
+            Version = "2.0.0.0";
 
         internal static ManualLogSource log;
         internal readonly Harmony harmony;
         internal readonly Assembly assembly;
-        public readonly string modFolder;
+        internal readonly string modFolder;
 
-        public static OffroadPackets packets;
+        internal static OffroadPackets packets;
 
         Main()
         {
@@ -30,13 +30,14 @@ namespace Terrain.Packets.Plugin
             assembly = Assembly.GetExecutingAssembly();
             modFolder = Path.GetDirectoryName(assembly.Location);
 
-            packets = OffroadPackets.Register<ImportantPackets>();
+            packets = OffroadPackets.Create<ImportantPackets>();
 
             harmony.PatchAll(assembly);
         }
 
-        public static void SendChatMessage(string message) => ChatBox.Instance.AppendMessage(-1, message, "<color=#03DAC6>[OffroadPackets]");
-        public static void Error(string error) {
+        internal static void SendChatMessage(string message) => ChatBox.Instance.AppendMessage(-1, message, "<color=#03DAC6>[OffroadPackets]");
+        internal static void Error(string error)
+        {
             log.LogError(error);
             SendChatMessage($"<color=#B00020>{error}");
         }

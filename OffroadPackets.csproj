@@ -10,6 +10,7 @@
     <RootNamespace>OffroadPackets</RootNamespace>
     <AssemblyName>OffroadPackets</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>preview</LangVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
@@ -17,10 +18,12 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>Package\plugins\$(AssemblyName)\</OutputPath>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>none</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>IDE0017;IDE0008;IDE0022;IDE0011;IDE0058</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -307,7 +310,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API.cs" />
+    <Compile Include="API.Packets.cs" />
+    <Compile Include="API.Requests.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CompileHandlers.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="ImportantPackets.cs" />
     <Compile Include="Main.cs" />
